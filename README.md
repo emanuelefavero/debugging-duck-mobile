@@ -28,3 +28,19 @@ npx react-native run-android
 ```bash
 npx react-native run-ios --simulator="iPhone 14 Pro"
 ```
+
+## **Build Android APK**
+
+```bash
+    npm install
+    npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+    cd android
+    ./gradlew assembleDebug
+```
+
+NOTE: If you want to use your a custom icon go to this website: [easy app icon](https://easyappicon.com/) and follow instructions to generate the icons and replace the ones in the android/app/src/main/res folder.
+BEWARE:
+
+1. The icon must be named ic_launcher.png.
+2. You also need to update AndroidManifest.xml (the one inside the main folder) as it is explained in the website.
+3. Don't put `<adaptive-icon...` code in the AndroidManifest.xml file, just the `<application...` code.
