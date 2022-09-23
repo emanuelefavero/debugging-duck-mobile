@@ -12,13 +12,10 @@ import {
   View,
   Dimensions,
   Animated,
-  //   Image,
   Easing,
   AppState,
-  //   StatusBar,
 } from 'react-native'
 
-// DUCK PHRASES
 // Import phrases that the duck will say on app load
 import phrases from './data/phrases.json'
 
@@ -32,10 +29,12 @@ const App: () => Node = () => {
   const latestAppState = React.useRef(AppState.currentState)
 
   const handleAppStateChange = newState => {
+    // Check if the app is opened after being inactive:
     if (
       latestAppState.current.match(/inactive|background/) &&
       newState === 'active'
     ) {
+      // ----- reset eyes position
       setTouchLocationX(0)
       setTouchLocationY(0)
       // ----- Show random phrase again when app is active
@@ -225,6 +224,86 @@ const App: () => Node = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  //   -- SMALL JUMP ANIMATION
+  const smallJumpValueHolder = useRef(new Animated.Value(0)).current
+
+  //   START
+  const startSmallJump = () => {
+    Animated.timing(smallJumpValueHolder, {
+      toValue: 1,
+      duration: 140,
+      easing: Easing.bounce,
+      useNativeDriver: false,
+    }).start()
+  }
+
+  //   REVERSE
+  const reverseSmallJump = () => {
+    Animated.timing(smallJumpValueHolder, {
+      toValue: 0,
+      duration: 200,
+      easing: Easing.bounce,
+      useNativeDriver: false,
+    }).start()
+  }
+
+  //   STOP
+  const stopSmallJump = () => {
+    smallJumpValueHolder.setValue(0)
+
+    Animated.timing(smallJumpValueHolder, {
+      toValue: 0,
+      duration: 0,
+      useNativeDriver: true,
+    }).stop()
+  }
+
+  //   VALUE
+  const smallJumpValue = smallJumpValueHolder.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '1deg'],
+  })
+
+  //   CALL
+  useEffect(() => {
+    setTimeout(() => {
+      startSmallJump()
+    }, 1300)
+
+    setTimeout(() => {
+      reverseSmallJump()
+    }, 1400)
+
+    setTimeout(() => {
+      stopSmallJump()
+    }, 1600)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      const interval = setInterval(() => {
+        setTimeout(() => {
+          setTimeout(() => {
+            startSmallJump()
+          }, 1300)
+
+          setTimeout(() => {
+            reverseSmallJump()
+          }, 1400)
+
+          setTimeout(() => {
+            stopSmallJump()
+          }, 1600)
+        }, Math.random() * 3000 + 1000)
+      }, 1000)
+      return () => clearInterval(interval)
+    }, 1500)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   //   -- HIDE SHOW ANIMATION
   const hideShowValueHolder = useRef(new Animated.Value(0)).current
 
@@ -307,7 +386,11 @@ const App: () => Node = () => {
             styles.image,
             {
               //   -- ANIMATIONS DYNAMIC DATA
-              transform: [{rotate: rotateValue}, {translateY: jumpValue}],
+              transform: [
+                {rotate: rotateValue},
+                {translateY: jumpValue},
+                {skewX: smallJumpValue},
+              ],
               //   bottom: jumpValue,
             },
           ]}
@@ -317,11 +400,18 @@ const App: () => Node = () => {
           style={[
             styles.image,
             {
-              transform: [{rotate: rotateValue}, {translateY: jumpValue}],
+              transform: [
+                {rotate: rotateValue},
+                {translateY: jumpValue},
+                {skewX: smallJumpValue},
+              ],
               bottom: jumpValue,
             },
             // Move the duck eyes to the location of the touch
-            {left: touchLocationX / 50, top: touchLocationY / 50},
+            {
+              left: touchLocationX / 50,
+              top: touchLocationY / 50,
+            },
           ]}
         />
         <Animated.Image
@@ -329,7 +419,11 @@ const App: () => Node = () => {
           style={[
             styles.image,
             {
-              transform: [{rotate: rotateValue}, {translateY: jumpValue}],
+              transform: [
+                {rotate: rotateValue},
+                {translateY: jumpValue},
+                {skewX: smallJumpValue},
+              ],
               bottom: jumpValue,
               opacity: hideShowValue,
             },
