@@ -3,8 +3,8 @@
  * @flow strict-local
  */
 
-import React, {useState, useEffect, useRef} from 'react';
-import type {Node} from 'react';
+import React, {useState, useEffect, useRef} from 'react'
+import type {Node} from 'react'
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,92 +16,65 @@ import {
   Easing,
   AppState,
   //   StatusBar,
-} from 'react-native';
+} from 'react-native'
 
 // DUCK PHRASES
-const phrases = [
-  'Hello friend, whatchu struggling with?',
-  'Whats the matter now?',
-  'Are you ok?',
-  "Wait a second…no I'm here.",
-  'Go on! I have all day!',
-  'Are you sure you thought of everything?',
-  'Fine. Tell me everything.',
-  "Hey, it's been a while, right?",
-  'What are you building?',
-  'What you broke this time?',
-  'Are you really talking to a rubber duck?',
-  'Hey, my favorite friend!',
-  'How you doing?',
-  'You good?',
-  "How's your day so far?",
-  'I like you…sometimes.',
-  'Soo...this awesome thing your working on?',
-  'Again?!',
-  'Things will be fixed, eventually',
-  'Hey, I was thinking of you! Broke something?',
-  'Am I the only one who loves javascript?',
-  "I'm listening...always 😱",
-  'Still here! With you, again...',
-  'I know you can do it...that thing...you know?',
-  "I'm here for you, not going anywhere!",
-  "I'm not going anywhere! As you know...",
-  "People say I'm a good listener...",
-];
+// Import phrases that the duck will say on app load
+import phrases from './data/phrases.json'
 
 const App: () => Node = () => {
   // ----- HANDLE APP STATE (Active & Inactive | background) -----
   useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange);
+    AppState.addEventListener('change', handleAppStateChange)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
-  const latestAppState = React.useRef(AppState.currentState);
+  const latestAppState = React.useRef(AppState.currentState)
 
   const handleAppStateChange = newState => {
     if (
       latestAppState.current.match(/inactive|background/) &&
       newState === 'active'
     ) {
-      setTouchLocationX(0);
-      setTouchLocationY(0);
+      setTouchLocationX(0)
+      setTouchLocationY(0)
       // ----- Show random phrase again when app is active
-      setRandomPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
-      reverseFade();
+      setRandomPhrase(phrases[Math.floor(Math.random() * phrases.length)])
+      reverseFade()
 
       setTimeout(() => {
-        startFade();
-      }, 1600);
+        startFade()
+      }, 1600)
       setTimeout(() => {
-        reverseFade();
-      }, 3500);
+        reverseFade()
+      }, 3500)
     }
-    latestAppState.current = newState;
-  };
+    latestAppState.current = newState
+  }
 
   // ----- FEATURES -----
   // Set randomPhrase every time the app is open
   const [randomPhrase, setRandomPhrase] = useState(
     phrases[Math.floor(Math.random() * phrases.length)],
-  );
+  )
 
   useEffect(() => {
-    setRandomPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
-  }, []);
+    setRandomPhrase(phrases[Math.floor(Math.random() * phrases.length)])
+  }, [])
 
   // Get X, Y coordinates of where the user touched the screen
   //   Necessary for the duck eyes to follow the user's finger
-  const [touchLocationX, setTouchLocationX] = useState(0);
-  const [touchLocationY, setTouchLocationY] = useState(0);
+  const [touchLocationX, setTouchLocationX] = useState(0)
+  const [touchLocationY, setTouchLocationY] = useState(0)
 
   function setCoordinatesFromTouch(e) {
-    setTouchLocationX(Math.floor(e.nativeEvent.locationX));
-    setTouchLocationY(Math.floor(e.nativeEvent.locationY));
+    setTouchLocationX(Math.floor(e.nativeEvent.locationX))
+    setTouchLocationY(Math.floor(e.nativeEvent.locationY))
   }
 
   // ----- ANIMATIONS ------
   //   -- FADE TEXT ANIMATION
-  const fadeValueHolder = useRef(new Animated.Value(0)).current;
+  const fadeValueHolder = useRef(new Animated.Value(0)).current
 
   //   START
   const startFade = () => {
@@ -110,8 +83,8 @@ const App: () => Node = () => {
       duration: 1000,
       //   easing: Easing.linear,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   REVERSE
   const reverseFade = () => {
@@ -120,8 +93,8 @@ const App: () => Node = () => {
       duration: 1000,
       //   easing: Easing.bounce,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   STOP
   //   const stopFade = () => {
@@ -137,24 +110,24 @@ const App: () => Node = () => {
   const fadeValue = fadeValueHolder.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 1],
-  });
+  })
 
   //   CALL
   useEffect(() => {
-    reverseFade();
+    reverseFade()
 
     setTimeout(() => {
-      startFade();
-    }, 1600);
+      startFade()
+    }, 1600)
     setTimeout(() => {
-      reverseFade();
-    }, 3500);
+      reverseFade()
+    }, 3500)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   //   -- ROTATE ANIMATION
-  const rotateValueHolder = useRef(new Animated.Value(0)).current;
+  const rotateValueHolder = useRef(new Animated.Value(0)).current
 
   //   START
   const startRotate = () => {
@@ -163,38 +136,38 @@ const App: () => Node = () => {
       duration: 1000,
       //   easing: Easing.linear,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   STOP
   const stopRotate = () => {
-    rotateValueHolder.setValue(0);
+    rotateValueHolder.setValue(0)
 
     Animated.timing(rotateValueHolder, {
       toValue: 0,
       duration: 0,
       useNativeDriver: true,
-    }).stop();
-  };
+    }).stop()
+  }
 
   //   VALUE
   const rotateValue = rotateValueHolder.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
-  });
+  })
 
   //   CALL
   useEffect(() => {
-    startRotate();
+    startRotate()
 
     setTimeout(() => {
-      stopRotate();
-    }, 1001);
+      stopRotate()
+    }, 1001)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   //   -- JUMP ANIMATION
-  const jumpValueHolder = useRef(new Animated.Value(0)).current;
+  const jumpValueHolder = useRef(new Animated.Value(0)).current
 
   //   START
   const startJump = () => {
@@ -203,8 +176,8 @@ const App: () => Node = () => {
       duration: 140,
       easing: Easing.bounce,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   REVERSE
   const reverseJump = () => {
@@ -213,47 +186,47 @@ const App: () => Node = () => {
       duration: 200,
       easing: Easing.bounce,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   STOP
   const stopJump = () => {
-    jumpValueHolder.setValue(0);
+    jumpValueHolder.setValue(0)
 
     Animated.timing(jumpValueHolder, {
       toValue: 0,
       duration: 0,
       useNativeDriver: true,
-    }).stop();
-  };
+    }).stop()
+  }
 
   //   VALUE
   const jumpValue = jumpValueHolder.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -24],
-  });
+  })
 
   //   CALL
   useEffect(() => {
     // startJump();
 
     setTimeout(() => {
-      startJump();
-    }, 1300);
+      startJump()
+    }, 1300)
 
     setTimeout(() => {
-      reverseJump();
-    }, 1400);
+      reverseJump()
+    }, 1400)
 
     setTimeout(() => {
-      stopJump();
-    }, 1600);
+      stopJump()
+    }, 1600)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   //   -- HIDE SHOW ANIMATION
-  const hideShowValueHolder = useRef(new Animated.Value(0)).current;
+  const hideShowValueHolder = useRef(new Animated.Value(0)).current
 
   //   START
   const startHideShow = () => {
@@ -262,8 +235,8 @@ const App: () => Node = () => {
       duration: 100,
       easing: Easing.easeInOutElastic,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   REVERSE
   const reverseHideShow = () => {
@@ -272,53 +245,53 @@ const App: () => Node = () => {
       duration: 200,
       //   easing: Easing.bounce,
       useNativeDriver: false,
-    }).start();
-  };
+    }).start()
+  }
 
   //   STOP
   const stopHideShow = () => {
-    hideShowValueHolder.setValue(0);
+    hideShowValueHolder.setValue(0)
 
     Animated.timing(hideShowValueHolder, {
       toValue: 0,
       duration: 0,
       useNativeDriver: true,
-    }).stop();
-  };
+    }).stop()
+  }
 
   //   VALUE
   const hideShowValue = hideShowValueHolder.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 1],
-  });
+  })
 
   async function startAnimationAtRandomInterval() {
-    await startHideShow();
+    await startHideShow()
     await setTimeout(() => {
-      reverseHideShow();
-    }, 400);
+      reverseHideShow()
+    }, 400)
     await setTimeout(() => {
-      stopHideShow();
-    }, 340);
+      stopHideShow()
+    }, 340)
   }
 
   //   CALL
   useEffect(() => {
     setTimeout(() => {
       const interval = setInterval(() => {
-        setTimeout(startAnimationAtRandomInterval, Math.random() * 4500 + 300);
-      }, 4000);
-      return () => clearInterval(interval);
-    }, 1500);
+        setTimeout(startAnimationAtRandomInterval, Math.random() * 4500 + 300)
+      }, 4000)
+      return () => clearInterval(interval)
+    }, 1500)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   //   ------ APP RENDER -----
   return (
     <SafeAreaView
       onTouchStart={e => {
-        setCoordinatesFromTouch(e);
+        setCoordinatesFromTouch(e)
       }}
       style={styles.body}>
       <View style={styles.headerContainer}>
@@ -364,16 +337,16 @@ const App: () => Node = () => {
         />
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 // STYLES
-let deviceWidth = Dimensions.get('window').width; //full width
-let deviceHeight = Dimensions.get('window').height; //full height
+let deviceWidth = Dimensions.get('window').width //full width
+let deviceHeight = Dimensions.get('window').height //full height
 
-const backgroundColor = 'rgb(6, 22, 38)';
-const color = 'rgb(215, 222, 233)';
-const headerColor = 'rgb(45, 63, 82)';
+const backgroundColor = 'rgb(6, 22, 38)'
+const color = 'rgb(215, 222, 233)'
+const headerColor = 'rgb(45, 63, 82)'
 
 const styles = StyleSheet.create({
   body: {
@@ -427,6 +400,6 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
   },
-});
+})
 
-export default App;
+export default App
