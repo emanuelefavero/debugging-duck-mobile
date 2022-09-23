@@ -207,8 +207,6 @@ const App: () => Node = () => {
 
   //   CALL
   useEffect(() => {
-    // startJump();
-
     setTimeout(() => {
       startJump()
     }, 1300)
@@ -224,12 +222,12 @@ const App: () => Node = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  //   -- SMALL JUMP ANIMATION
-  const smallJumpValueHolder = useRef(new Animated.Value(0)).current
+  //   -- BREATHING ANIMATION
+  const breathingValueHolder = useRef(new Animated.Value(0)).current
 
   //   START
-  const startSmallJump = () => {
-    Animated.timing(smallJumpValueHolder, {
+  const startBreathing = () => {
+    Animated.timing(breathingValueHolder, {
       toValue: 1,
       duration: 140,
       easing: Easing.bounce,
@@ -238,8 +236,8 @@ const App: () => Node = () => {
   }
 
   //   REVERSE
-  const reverseSmallJump = () => {
-    Animated.timing(smallJumpValueHolder, {
+  const reverseBreathing = () => {
+    Animated.timing(breathingValueHolder, {
       toValue: 0,
       duration: 200,
       easing: Easing.bounce,
@@ -248,10 +246,10 @@ const App: () => Node = () => {
   }
 
   //   STOP
-  const stopSmallJump = () => {
-    smallJumpValueHolder.setValue(0)
+  const stopBreathing = () => {
+    breathingValueHolder.setValue(0)
 
-    Animated.timing(smallJumpValueHolder, {
+    Animated.timing(breathingValueHolder, {
       toValue: 0,
       duration: 0,
       useNativeDriver: true,
@@ -259,7 +257,7 @@ const App: () => Node = () => {
   }
 
   //   VALUE
-  const smallJumpValue = smallJumpValueHolder.interpolate({
+  const breathingValue = breathingValueHolder.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '1deg'],
   })
@@ -267,15 +265,15 @@ const App: () => Node = () => {
   //   CALL
   useEffect(() => {
     setTimeout(() => {
-      startSmallJump()
+      startBreathing()
     }, 1300)
 
     setTimeout(() => {
-      reverseSmallJump()
+      reverseBreathing()
     }, 1400)
 
     setTimeout(() => {
-      stopSmallJump()
+      stopBreathing()
     }, 1600)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -286,15 +284,15 @@ const App: () => Node = () => {
       const interval = setInterval(() => {
         setTimeout(() => {
           setTimeout(() => {
-            startSmallJump()
+            startBreathing()
           }, 1300)
 
           setTimeout(() => {
-            reverseSmallJump()
+            reverseBreathing()
           }, 1400)
 
           setTimeout(() => {
-            stopSmallJump()
+            stopBreathing()
           }, 1600)
         }, Math.random() * 3000 + 1000)
       }, 1000)
@@ -389,7 +387,7 @@ const App: () => Node = () => {
               transform: [
                 {rotate: rotateValue},
                 {translateY: jumpValue},
-                {skewX: smallJumpValue},
+                {skewX: breathingValue},
               ],
               //   bottom: jumpValue,
             },
@@ -403,7 +401,7 @@ const App: () => Node = () => {
               transform: [
                 {rotate: rotateValue},
                 {translateY: jumpValue},
-                {skewX: smallJumpValue},
+                {skewX: breathingValue},
               ],
               bottom: jumpValue,
             },
@@ -422,7 +420,7 @@ const App: () => Node = () => {
               transform: [
                 {rotate: rotateValue},
                 {translateY: jumpValue},
-                {skewX: smallJumpValue},
+                {skewX: breathingValue},
               ],
               bottom: jumpValue,
               opacity: hideShowValue,
