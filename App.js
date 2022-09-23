@@ -14,6 +14,7 @@ import {
   Animated,
   //   Image,
   Easing,
+  AppState,
   //   StatusBar,
 } from 'react-native';
 
@@ -42,9 +43,42 @@ const phrases = [
   'Am I the only one who loves javascript?',
   "I'm listening...always 😱",
   'Still here! With you, again...',
+  'I know you can do it...that thing...you know?',
+  "I'm here for you, not going anywhere!",
+  "I'm not going anywhere! As you know...",
+  "People say I'm a good listener...",
 ];
 
 const App: () => Node = () => {
+  // ----- HANDLE APP STATE (Active & Inactive | background) -----
+  useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const latestAppState = React.useRef(AppState.currentState);
+
+  const handleAppStateChange = newState => {
+    if (
+      latestAppState.current.match(/inactive|background/) &&
+      newState === 'active'
+    ) {
+      setTouchLocationX(0);
+      setTouchLocationY(0);
+      // ----- Show random phrase again when app is active
+      setRandomPhrase(phrases[Math.floor(Math.random() * phrases.length)]);
+      reverseFade();
+
+      setTimeout(() => {
+        startFade();
+      }, 1600);
+      setTimeout(() => {
+        reverseFade();
+      }, 3500);
+    }
+    latestAppState.current = newState;
+  };
+
   // ----- FEATURES -----
   // Set randomPhrase every time the app is open
   const [randomPhrase, setRandomPhrase] = useState(
@@ -66,6 +100,59 @@ const App: () => Node = () => {
   }
 
   // ----- ANIMATIONS ------
+  //   -- FADE TEXT ANIMATION
+  const fadeValueHolder = useRef(new Animated.Value(0)).current;
+
+  //   START
+  const startFade = () => {
+    Animated.timing(fadeValueHolder, {
+      toValue: 1,
+      duration: 1000,
+      //   easing: Easing.linear,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  //   REVERSE
+  const reverseFade = () => {
+    Animated.timing(fadeValueHolder, {
+      toValue: 0,
+      duration: 1000,
+      //   easing: Easing.bounce,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  //   STOP
+  //   const stopFade = () => {
+  //     Animated.timing(fadeValueHolder, {
+  //       toValue: 0,
+  //       duration: 1000,
+  //       //   easing: Easing.linear,
+  //       useNativeDriver: false,
+  //     }).stop();
+  //   };
+
+  //   VALUE
+  const fadeValue = fadeValueHolder.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  //   CALL
+  useEffect(() => {
+    reverseFade();
+
+    setTimeout(() => {
+      startFade();
+    }, 1600);
+    setTimeout(() => {
+      reverseFade();
+    }, 3500);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   //   -- ROTATE ANIMATION
   const rotateValueHolder = useRef(new Animated.Value(0)).current;
 
@@ -165,56 +252,64 @@ const App: () => Node = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //   -- FADE ANIMATION
-  const fadeValueHolder = useRef(new Animated.Value(0)).current;
+  //   -- HIDE SHOW ANIMATION
+  const hideShowValueHolder = useRef(new Animated.Value(0)).current;
 
   //   START
-  const startFade = () => {
-    Animated.timing(fadeValueHolder, {
+  const startHideShow = () => {
+    Animated.timing(hideShowValueHolder, {
       toValue: 1,
-      duration: 1000,
-      //   easing: Easing.linear,
+      duration: 100,
+      easing: Easing.easeInOutElastic,
       useNativeDriver: false,
     }).start();
   };
 
   //   REVERSE
-  const reverseFade = () => {
-    Animated.timing(fadeValueHolder, {
+  const reverseHideShow = () => {
+    Animated.timing(hideShowValueHolder, {
       toValue: 0,
-      duration: 1000,
+      duration: 200,
       //   easing: Easing.bounce,
       useNativeDriver: false,
     }).start();
   };
 
   //   STOP
-  //   const stopFade = () => {
-  //     Animated.timing(fadeValueHolder, {
-  //       toValue: 0,
-  //       duration: 1000,
-  //       //   easing: Easing.linear,
-  //       useNativeDriver: false,
-  //     }).stop();
-  //   };
+  const stopHideShow = () => {
+    hideShowValueHolder.setValue(0);
+
+    Animated.timing(hideShowValueHolder, {
+      toValue: 0,
+      duration: 0,
+      useNativeDriver: true,
+    }).stop();
+  };
 
   //   VALUE
-  const fadeValue = fadeValueHolder.interpolate({
+  const hideShowValue = hideShowValueHolder.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 1],
   });
 
+  async function startAnimationAtRandomInterval() {
+    await startHideShow();
+    await setTimeout(() => {
+      reverseHideShow();
+    }, 400);
+    await setTimeout(() => {
+      stopHideShow();
+    }, 340);
+  }
+
   //   CALL
   useEffect(() => {
-    // startFade();
-    reverseFade();
-
     setTimeout(() => {
-      startFade();
-    }, 1600);
-    setTimeout(() => {
-      reverseFade();
-    }, 3500);
+      const interval = setInterval(() => {
+        setTimeout(startAnimationAtRandomInterval, Math.random() * 4500 + 300);
+      }, 4000);
+      return () => clearInterval(interval);
+    }, 1500);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -254,6 +349,17 @@ const App: () => Node = () => {
             },
             // Move the duck eyes to the location of the touch
             {left: touchLocationX / 50, top: touchLocationY / 50},
+          ]}
+        />
+        <Animated.Image
+          source={require('./assets/rubber-duck-eyelids-closed.png')}
+          style={[
+            styles.image,
+            {
+              transform: [{rotate: rotateValue}, {translateY: jumpValue}],
+              bottom: jumpValue,
+              opacity: hideShowValue,
+            },
           ]}
         />
       </View>
