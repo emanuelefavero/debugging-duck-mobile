@@ -70,3 +70,7 @@ BEWARE:
 > - Add a way to change the duck's color
 > - Add rubber duck sounds when you tap on it
 > - Add a way to choose 3d or 2d duck
+
+## License
+
+- [MIT](LICENSE.md)
